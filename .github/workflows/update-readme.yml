@@ -1,0 +1,32 @@
+name: Update README with GitHub Data
+
+on:
+  schedule:
+    - cron: '0 0 * * *'  # 每天0点自动运行
+  workflow_dispatch:      # 允许手动触发
+
+jobs:
+  update-readme:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.x'
+
+      - name: Install dependencies
+        run: pip install requests
+
+      - name: Run update script
+        run: python scripts/update_readme.py
+
+      - name: Commit and push if changed
+        run: |
+          git config --global user.name 'github-actions[bot]'
+          git config --global user.email 'github-actions[bot]@users.noreply.github.com'
+          git add README.md
+          git commit -m "chore: update README with latest GitHub data" || echo "No changes to commit"
+          git push 
